@@ -149,11 +149,11 @@ Tablas que espera el backend (el esquema debe estar aplicado en PostgreSQL):
 
 Y la vista `vista_asistencia_alumno` (`id_alumno`, `alumno_nombre`, `id_banda`, `nombre_banda`, `total_eventos`, `total_asistencias`, `porcentaje_asistencia`, `porcentaje_minimo_requerido`), que usa el endpoint de porcentaje de asistencia. Solo incluye a los alumnos que tienen al menos un registro de asistencia y no filtra por `activo`; el endpoint sí excluye a los alumnos y bandas desactivados.
 
-El archivo `base de datos/Script de creacion de base de datos.txt` crea este esquema completo (las 10 tablas y la vista) sobre una base vacía. Ya **no borra nada**: no incluye `DROP TABLE`, y si una tabla ya existe simplemente falla sin tocar los datos.
+El archivo [`../database/Script de creacion de base de datos.txt`](../database/Script%20de%20creacion%20de%20base%20de%20datos.txt) crea este esquema completo (las 10 tablas y la vista) sobre una base vacía. Ya **no borra nada**: no incluye `DROP TABLE`, y si una tabla ya existe simplemente falla sin tocar los datos.
 
 El script se generó leyendo el catálogo de la base de datos real (tipos, valores por defecto, restricciones, llaves foráneas, índices y el cuerpo de la vista), así que reproduce ese esquema exactamente; no hay nada inferido. Incluye además el porcentaje mínimo general de asistencia (80 %, el valor de la base real) como una fila en `config_asistencia` con `id_banda` en `NULL`. Sin esa fila, `porcentaje_minimo_requerido` queda vacío y ningún alumno aparecería `en_riesgo`. Solo puede haber una: un índice único parcial (`idx_config_asistencia_global`) lo garantiza.
 
-Si tu base de datos ya está creada y no quieres recrearla, aplica solo ese índice con la migración `base de datos/Migracion 01 - indice unico de configuracion general.sql` (es repetible sin error, y falla sin cambiar nada si ya hubiera dos filas generales).
+Si tu base de datos ya está creada y no quieres recrearla, aplica solo ese índice con la migración [`../database/Migracion 01 - indice unico de configuracion general.sql`](../database/Migracion%2001%20-%20indice%20unico%20de%20configuracion%20general.sql) (es repetible sin error, y falla sin cambiar nada si ya hubiera dos filas generales).
 
 ## Roles y permisos
 
