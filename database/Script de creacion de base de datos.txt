@@ -10,7 +10,8 @@
 -- (pg_attribute, pg_constraint, pg_indexes y pg_get_viewdef) el 2026-09-20,
 -- en una transaccion de solo lectura. No hay nada inferido.
 -- Unica adicion posterior: el indice idx_config_asistencia_global (ver "Migracion 01"), que se
--- agrego tanto a este script como a la base real.
+-- agrego tanto a este script como a la base real. Las tablas 12-14 (blog, solicitudes de inscripcion
+-- y testimonios) se agregaron igual, ver "Migracion 02".
 -- Los comentarios explican para que sirve cada dato; no forman parte del DDL real.
 -- =====================================================================
 
@@ -195,3 +196,48 @@ CREATE OR REPLACE VIEW public.vista_asistencia_alumno AS
      LEFT JOIN config_asistencia cb ON cb.id_banda = b.id_banda
      LEFT JOIN config_asistencia cg ON cg.id_banda IS NULL
   GROUP BY a.id_alumno, a.nombre, b.id_banda, b.nombre_banda, cb.porcentaje_minimo, cg.porcentaje_minimo;
+
+-- 12. TABLA ENTRADA_BLOG (entradas del blog de la fundacion, publicadas por un Admin)
+CREATE TABLE public.entrada_blog (
+	id_entrada serial4 NOT NULL,
+	titulo varchar(150) NOT NULL,
+	resumen text NOT NULL,
+	foto varchar(255) NULL, -- Ruta relativa al archivo subido (ej. uploads/blog/1234-archivo.jpg), no la ruta absoluta del disco
+	enlace_facebook varchar(500) NULL, -- Opcional, link al post original
+	fecha date DEFAULT CURRENT_DATE NOT NULL,
+	activo bool DEFAULT true NOT NULL, -- Borrado logico: false = eliminada
+	creado_por int4 NULL, -- Profesor que la publico (sale del token); queda NULL si luego se borra al profesor
+	created_at timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT entrada_blog_pkey PRIMARY KEY (id_entrada),
+	CONSTRAINT entrada_blog_creado_por_fkey FOREIGN KEY (creado_por) REFERENCES public.profesor(id_profesor) ON DELETE SET NULL
+);
+
+-- 13. TABLA SOLICITUD_INSCRIPCION (formulario publico de interes en inscribirse; no crea un alumno)
+CREATE TABLE public.solicitud_inscripcion (
+	id_solicitud serial4 NOT NULL,
+	nombre_alumno varchar(150) NOT NULL,
+	edad int4 NULL,
+	banda_interes varchar(20) NULL,
+	nombre_contacto varchar(150) NOT NULL,
+	telefono_contacto varchar(30) NOT NULL,
+	correo_contacto varchar(150) NULL,
+	mensaje text NULL,
+	estado varchar(20) DEFAULT 'pendiente'::character varying NOT NULL, -- pendiente -> contactado -> inscrito, o descartado
+	created_at timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT solicitud_inscripcion_pkey PRIMARY KEY (id_solicitud),
+	CONSTRAINT solicitud_inscripcion_banda_interes_check CHECK (banda_interes::text = ANY (ARRAY['paz'::character varying, 'clasica'::character varying, 'orquesta'::character varying]::text[])),
+	CONSTRAINT solicitud_inscripcion_estado_check CHECK (estado::text = ANY (ARRAY['pendiente'::character varying, 'contactado'::character varying, 'inscrito'::character varying, 'descartado'::character varying]::text[]))
+);
+
+-- 14. TABLA TESTIMONIO (testimonios de padres, alumnos o profesores para el sitio publico)
+CREATE TABLE public.testimonio (
+	id_testimonio serial4 NOT NULL,
+	autor varchar(150) NOT NULL,
+	rol varchar(20) NULL,
+	texto text NOT NULL,
+	foto varchar(255) NULL, -- Ruta relativa al archivo subido (ej. uploads/testimonios/1234-archivo.jpg)
+	activo bool DEFAULT true NOT NULL, -- Borrado logico: false = eliminado
+	created_at timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT testimonio_pkey PRIMARY KEY (id_testimonio),
+	CONSTRAINT testimonio_rol_check CHECK (rol::text = ANY (ARRAY['padre'::character varying, 'alumno'::character varying, 'profesor'::character varying]::text[]))
+);
