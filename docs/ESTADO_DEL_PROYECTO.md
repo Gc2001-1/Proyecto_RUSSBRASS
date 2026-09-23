@@ -1,5 +1,7 @@
 # RussBrass — Sistema de asistencia — Estado del proyecto
 
+> Este documento es la bitácora de avance del proyecto; se actualiza en cada fase. Para el contexto original, ver [`WORLD.md`](WORLD.md); para la referencia técnica vigente, ver [`../banda-backend/README.md`](../banda-backend/README.md) y [`../banda-backend/docs/API.md`](../banda-backend/docs/API.md).
+
 **Fecha de este corte:** 20 de septiembre, 2026
 **Fase actual:** Fase 1 (Backend) — completada y validada en vivo
 

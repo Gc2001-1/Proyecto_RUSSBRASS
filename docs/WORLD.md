@@ -1,5 +1,7 @@
 # Documentación Formal del Proyecto
 
+> Este documento describe el mundo/contexto original del proyecto. Para el avance por fases, ver [`ESTADO_DEL_PROYECTO.md`](ESTADO_DEL_PROYECTO.md); para la referencia técnica vigente, ver [`../banda-backend/README.md`](../banda-backend/README.md) y [`../banda-backend/docs/API.md`](../banda-backend/docs/API.md).
+
 ## Título del proyecto
 Sistema web de control de asistencia para profesores
 
