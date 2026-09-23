@@ -20,7 +20,12 @@ const LIMITES_TEXTO = Object.freeze({
     banda: Object.freeze({ nombre_banda: 150 }),
     profesor: Object.freeze({ nombre: 150, correo: 150 }),
     ensayo: Object.freeze({ lugar: 150 }),
-    presentacion: Object.freeze({ lugar_presentacion: 150 })
+    presentacion: Object.freeze({ lugar_presentacion: 150 }),
+    // resumen/mensaje/texto son `text` (sin límite en la base): 2000 es un tope razonable de aplicación,
+    // no el tamaño de una columna. enlace_facebook sí es varchar(500), igual que los demás campos varchar.
+    blog: Object.freeze({ titulo: 150, resumen: 2000, enlace_facebook: 500 }),
+    inscripcion: Object.freeze({ nombre_alumno: 150, nombre_contacto: 150, telefono_contacto: 30, correo_contacto: 150, mensaje: 2000 }),
+    testimonio: Object.freeze({ autor: 150, texto: 2000 })
 });
 
 // Comprueba que ningún campo supere su largo máximo. `valores` es un objeto { campo: valor } y
