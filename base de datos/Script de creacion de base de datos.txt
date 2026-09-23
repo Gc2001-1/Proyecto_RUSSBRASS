@@ -1,0 +1,197 @@
+-- =====================================================================
+-- Esquema de la base de datos: sistema de control de bandas y asistencia
+-- Motor: PostgreSQL (extraido de una base real con PostgreSQL 17.10)
+--
+-- Este script CREA el esquema desde cero (no borra nada). Si una tabla ya
+-- existe, el CREATE TABLE falla y no toca los datos. No incluye DROP.
+--
+-- Origen: todo (tipos, valores por defecto, restricciones, llaves foraneas,
+-- indices y el cuerpo de la vista) fue leido del catalogo de la base real
+-- (pg_attribute, pg_constraint, pg_indexes y pg_get_viewdef) el 2026-09-20,
+-- en una transaccion de solo lectura. No hay nada inferido.
+-- Unica adicion posterior: el indice idx_config_asistencia_global (ver "Migracion 01"), que se
+-- agrego tanto a este script como a la base real.
+-- Los comentarios explican para que sirve cada dato; no forman parte del DDL real.
+-- =====================================================================
+
+-- 1. TABLA BANDA
+CREATE TABLE public.banda (
+	id_banda serial4 NOT NULL,
+	nombre_banda varchar(150) NOT NULL,
+	tipo varchar(20) DEFAULT 'paz'::character varying NOT NULL, -- El backend exige uno de: paz, clasica, orquesta
+	descripcion text NULL,
+	activo bool DEFAULT true NOT NULL, -- Borrado logico: false = eliminada
+	created_at timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT banda_pkey PRIMARY KEY (id_banda),
+	CONSTRAINT banda_nombre_banda_key UNIQUE (nombre_banda),
+	CONSTRAINT banda_tipo_check CHECK (tipo::text = ANY (ARRAY['paz'::character varying, 'clasica'::character varying, 'orquesta'::character varying]::text[]))
+);
+
+-- 2. TABLA PROFESOR
+CREATE TABLE public.profesor (
+	id_profesor serial4 NOT NULL,
+	nombre varchar(150) NOT NULL,
+	correo varchar(150) NOT NULL,
+	contrasena varchar(255) NOT NULL, -- Hash bcrypt (60 caracteres). Nunca texto plano.
+	rol varchar(20) DEFAULT 'Profesor'::character varying NOT NULL, -- Admin o Profesor
+	activo bool DEFAULT true NOT NULL, -- Borrado logico: false = eliminado, no puede iniciar sesion
+	created_at timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT profesor_pkey PRIMARY KEY (id_profesor),
+	CONSTRAINT profesor_correo_key UNIQUE (correo),
+	CONSTRAINT profesor_rol_check CHECK (rol::text = ANY (ARRAY['Admin'::character varying, 'Profesor'::character varying]::text[]))
+);
+
+-- 3. TABLA ALUMNO
+CREATE TABLE public.alumno (
+	id_alumno serial4 NOT NULL,
+	nombre varchar(150) NOT NULL,
+	telefono varchar(30) NULL,
+	direccion varchar(255) NULL,
+	fecha_inscripcion date DEFAULT CURRENT_DATE NOT NULL,
+	activo bool DEFAULT true NOT NULL, -- Borrado logico: false = eliminado
+	CONSTRAINT alumno_pkey PRIMARY KEY (id_alumno)
+);
+
+-- 4. TABLA INTERMEDIA PROFESOR_BANDA (que profesor da clase en que banda)
+-- La clave primaria compuesta es necesaria: el backend usa ON CONFLICT DO NOTHING al asignar.
+CREATE TABLE public.profesor_banda (
+	id_profesor int4 NOT NULL,
+	id_banda int4 NOT NULL,
+	asignado_en timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT profesor_banda_pkey PRIMARY KEY (id_profesor, id_banda),
+	CONSTRAINT profesor_banda_id_banda_fkey FOREIGN KEY (id_banda) REFERENCES public.banda(id_banda) ON DELETE CASCADE,
+	CONSTRAINT profesor_banda_id_profesor_fkey FOREIGN KEY (id_profesor) REFERENCES public.profesor(id_profesor) ON DELETE CASCADE
+);
+
+-- 5. TABLA INTERMEDIA ALUMNO_BANDA (a que bandas pertenece un alumno; puede ser a varias)
+-- La clave primaria compuesta es necesaria: el backend usa ON CONFLICT DO NOTHING al asignar.
+CREATE TABLE public.alumno_banda (
+	id_alumno int4 NOT NULL,
+	id_banda int4 NOT NULL,
+	fecha_ingreso date DEFAULT CURRENT_DATE NOT NULL,
+	CONSTRAINT alumno_banda_pkey PRIMARY KEY (id_alumno, id_banda),
+	CONSTRAINT alumno_banda_id_alumno_fkey FOREIGN KEY (id_alumno) REFERENCES public.alumno(id_alumno) ON DELETE CASCADE,
+	CONSTRAINT alumno_banda_id_banda_fkey FOREIGN KEY (id_banda) REFERENCES public.banda(id_banda) ON DELETE CASCADE
+);
+
+-- 6. TABLA ENSAYO
+-- fecha, hora y lugar son opcionales al registrar: el backend solo los envia si vienen en la peticion.
+CREATE TABLE public.ensayo (
+	id_ensayo serial4 NOT NULL,
+	id_banda int4 NOT NULL,
+	id_profesor int4 NULL, -- Profesor que registro el ensayo (sale del token); queda NULL si luego se borra al profesor
+	descripcion text NULL,
+	fecha date DEFAULT CURRENT_DATE NOT NULL,
+	hora time NULL,
+	lugar varchar(150) NULL,
+	created_at timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT ensayo_pkey PRIMARY KEY (id_ensayo),
+	CONSTRAINT ensayo_id_banda_fkey FOREIGN KEY (id_banda) REFERENCES public.banda(id_banda) ON DELETE RESTRICT,
+	CONSTRAINT ensayo_id_profesor_fkey FOREIGN KEY (id_profesor) REFERENCES public.profesor(id_profesor) ON DELETE SET NULL
+);
+CREATE INDEX idx_ensayo_banda_fecha ON public.ensayo USING btree (id_banda, fecha);
+
+-- 7. TABLA PRESENTACION
+CREATE TABLE public.presentacion (
+	id_presentacion serial4 NOT NULL,
+	id_banda int4 NOT NULL,
+	fecha date NOT NULL,
+	lugar_presentacion varchar(150) NULL, -- La base lo permite vacio; el backend lo exige al registrar
+	descripcion text NULL,
+	created_at timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT presentacion_pkey PRIMARY KEY (id_presentacion),
+	CONSTRAINT presentacion_id_banda_fkey FOREIGN KEY (id_banda) REFERENCES public.banda(id_banda) ON DELETE RESTRICT
+);
+
+-- 8. TABLA ASISTENCIA ENSAYO
+CREATE TABLE public.asistencia_ensayo (
+	id_asistencia serial4 NOT NULL,
+	id_ensayo int4 NOT NULL,
+	id_alumno int4 NOT NULL,
+	asistio bool DEFAULT false NOT NULL,
+	justificacion text NULL, -- Motivo de la falta (opcional)
+	registrado_por int4 NULL, -- Profesor que registro la asistencia (sale del token)
+	created_at timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT asistencia_ensayo_pkey PRIMARY KEY (id_asistencia),
+	CONSTRAINT asistencia_ensayo_id_ensayo_id_alumno_key UNIQUE (id_ensayo, id_alumno), -- un alumno, un registro por ensayo
+	CONSTRAINT asistencia_ensayo_id_alumno_fkey FOREIGN KEY (id_alumno) REFERENCES public.alumno(id_alumno) ON DELETE CASCADE,
+	CONSTRAINT asistencia_ensayo_id_ensayo_fkey FOREIGN KEY (id_ensayo) REFERENCES public.ensayo(id_ensayo) ON DELETE CASCADE,
+	CONSTRAINT asistencia_ensayo_registrado_por_fkey FOREIGN KEY (registrado_por) REFERENCES public.profesor(id_profesor) ON DELETE SET NULL
+);
+CREATE INDEX idx_asistencia_ensayo_alumno ON public.asistencia_ensayo USING btree (id_alumno);
+
+-- 9. TABLA ASISTENCIA PRESENTACION
+CREATE TABLE public.asistencia_presentacion (
+	id_asistencia serial4 NOT NULL,
+	id_presentacion int4 NOT NULL,
+	id_alumno int4 NOT NULL,
+	asistio bool DEFAULT false NOT NULL,
+	justificacion text NULL, -- Motivo de la falta (opcional)
+	registrado_por int4 NULL, -- Profesor que registro la asistencia (sale del token)
+	created_at timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT asistencia_presentacion_pkey PRIMARY KEY (id_asistencia),
+	CONSTRAINT asistencia_presentacion_id_presentacion_id_alumno_key UNIQUE (id_presentacion, id_alumno), -- un alumno, un registro por presentacion
+	CONSTRAINT asistencia_presentacion_id_alumno_fkey FOREIGN KEY (id_alumno) REFERENCES public.alumno(id_alumno) ON DELETE CASCADE,
+	CONSTRAINT asistencia_presentacion_id_presentacion_fkey FOREIGN KEY (id_presentacion) REFERENCES public.presentacion(id_presentacion) ON DELETE CASCADE,
+	CONSTRAINT asistencia_presentacion_registrado_por_fkey FOREIGN KEY (registrado_por) REFERENCES public.profesor(id_profesor) ON DELETE SET NULL
+);
+CREATE INDEX idx_asistencia_presentacion_alumno ON public.asistencia_presentacion USING btree (id_alumno);
+
+-- 10. TABLA CONFIG_ASISTENCIA (porcentaje minimo de asistencia)
+-- Una fila con id_banda NULL es el minimo general; una fila con id_banda es el minimo propio de esa banda
+-- (la propia de la banda tiene prioridad sobre la general).
+CREATE TABLE public.config_asistencia (
+	id serial4 NOT NULL,
+	id_banda int4 NULL,
+	porcentaje_minimo numeric(5,2) DEFAULT 80.00 NOT NULL,
+	CONSTRAINT config_asistencia_pkey PRIMARY KEY (id),
+	CONSTRAINT config_asistencia_id_banda_key UNIQUE (id_banda),
+	CONSTRAINT config_asistencia_id_banda_fkey FOREIGN KEY (id_banda) REFERENCES public.banda(id_banda) ON DELETE CASCADE,
+	CONSTRAINT config_asistencia_porcentaje_minimo_check CHECK (porcentaje_minimo >= 0::numeric AND porcentaje_minimo <= 100::numeric)
+);
+
+-- Solo puede haber UNA fila general (id_banda NULL). El UNIQUE de id_banda no lo impide, porque en
+-- PostgreSQL varios NULL no se consideran iguales, y con dos filas generales la vista repetiria filas.
+-- Este indice parcial (Migracion 01) lo garantiza sin afectar a las filas propias de cada banda.
+CREATE UNIQUE INDEX idx_config_asistencia_global ON public.config_asistencia ((id_banda IS NULL)) WHERE id_banda IS NULL;
+
+-- Porcentaje minimo GENERAL de asistencia (id_banda NULL). Es el valor que tiene la base real (80.00).
+-- Sin esta fila, porcentaje_minimo_requerido queda vacio y ningun alumno puede salir "en_riesgo".
+INSERT INTO public.config_asistencia (id_banda, porcentaje_minimo) VALUES (NULL, 80.00);
+
+-- 11. VISTA VISTA_ASISTENCIA_ALUMNO
+-- La usa GET /api/asistencia/porcentaje. Definicion tal como esta en la base real (pg_get_viewdef).
+-- Solo aparecen los alumnos que tienen al menos un registro de asistencia en esa banda (ensayos y
+-- presentaciones); un alumno sin registros no tiene fila. No filtra por activo.
+-- porcentaje_asistencia va de 0 a 100 con 2 decimales. porcentaje_minimo_requerido es el propio de
+-- la banda si existe, y si no el general.
+CREATE OR REPLACE VIEW public.vista_asistencia_alumno AS
+ WITH eventos AS (
+         SELECT ab.id_alumno,
+            ab.id_banda,
+            ae.asistio
+           FROM alumno_banda ab
+             JOIN ensayo e ON e.id_banda = ab.id_banda
+             JOIN asistencia_ensayo ae ON ae.id_ensayo = e.id_ensayo AND ae.id_alumno = ab.id_alumno
+        UNION ALL
+         SELECT ab.id_alumno,
+            ab.id_banda,
+            ap.asistio
+           FROM alumno_banda ab
+             JOIN presentacion p ON p.id_banda = ab.id_banda
+             JOIN asistencia_presentacion ap ON ap.id_presentacion = p.id_presentacion AND ap.id_alumno = ab.id_alumno
+        )
+ SELECT a.id_alumno,
+    a.nombre AS alumno_nombre,
+    b.id_banda,
+    b.nombre_banda,
+    count(ev.asistio) AS total_eventos,
+    count(*) FILTER (WHERE ev.asistio) AS total_asistencias,
+    round(100.0 * count(*) FILTER (WHERE ev.asistio)::numeric / NULLIF(count(ev.asistio), 0)::numeric, 2) AS porcentaje_asistencia,
+    COALESCE(cb.porcentaje_minimo, cg.porcentaje_minimo) AS porcentaje_minimo_requerido
+   FROM eventos ev
+     JOIN alumno a ON a.id_alumno = ev.id_alumno
+     JOIN banda b ON b.id_banda = ev.id_banda
+     LEFT JOIN config_asistencia cb ON cb.id_banda = b.id_banda
+     LEFT JOIN config_asistencia cg ON cg.id_banda IS NULL
+  GROUP BY a.id_alumno, a.nombre, b.id_banda, b.nombre_banda, cb.porcentaje_minimo, cg.porcentaje_minimo;

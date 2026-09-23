@@ -1,0 +1,8 @@
+### 1. Login como Admin
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "correo": "admin@russbrass.org",
+  "contrasena": "RussBrass2026!"
+}

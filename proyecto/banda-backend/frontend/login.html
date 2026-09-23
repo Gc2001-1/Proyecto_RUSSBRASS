@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Acceso para profesores — RussBrass</title>
+<link rel="icon" href="assets/logo.jpg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Work+Sans:wght@400;500&family=Bebas+Neue&display=swap">
+<link rel="stylesheet" href="css/panel.css">
+</head>
+<body>
+
+<div class="login">
+  <div class="login__marca sobre-oscuro">
+    <div class="cabeza" style="display:flex;align-items:center;gap:14px;">
+      <img src="assets/logo.jpg" alt="Logo de la Fundación RussBrass">
+      <span class="wordmark">RussBrass</span>
+    </div>
+    <p class="frase">Cada ensayo cuenta. <em>Aquí se lleva la cuenta.</em></p>
+  </div>
+
+  <main class="login__contenido">
+    <a class="login__volver" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+      Volver al sitio
+    </a>
+
+    <h1 id="titulo">Acceso para profesores</h1>
+    <p>Ingresa con tu correo y tu contraseña para pasar asistencia y ver tus bandas.</p>
+
+    <div id="aviso" aria-live="polite"></div>
+
+    <form id="form-login" novalidate>
+      <div class="campo">
+        <label for="correo">Correo</label>
+        <input id="correo" name="correo" type="email" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="150" required>
+      </div>
+
+      <div class="campo">
+        <label for="contrasena">Contraseña</label>
+        <div class="campo-clave">
+          <input id="contrasena" name="contrasena" type="password" autocomplete="current-password" required>
+          <button type="button" class="btn" id="ver-clave" aria-controls="contrasena" aria-pressed="false">Mostrar</button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn--primario btn--grande btn--completo" id="entrar">Entrar</button>
+    </form>
+  </main>
+</div>
+
+<noscript><p style="padding:24px;">Este panel necesita JavaScript para funcionar.</p></noscript>
+
+<script src="js/config.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/api.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>

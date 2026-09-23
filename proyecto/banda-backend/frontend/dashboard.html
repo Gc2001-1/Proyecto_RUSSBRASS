@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Panel — RussBrass</title>
+<link rel="icon" href="assets/logo.jpg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Work+Sans:wght@400;500&family=Bebas+Neue&display=swap">
+<link rel="stylesheet" href="css/panel.css">
+</head>
+<body>
+
+<header class="cabecera sobre-oscuro">
+  <div class="cabecera__fila">
+    <a class="cabecera__marca" href="#/bandas" aria-label="RussBrass, ir a las bandas">
+      <img src="assets/logo.jpg" alt="">
+      <span class="wordmark">RussBrass</span>
+    </a>
+    <div class="cabecera__usuario">
+      <div class="cabecera__nombre" id="usuario"></div>
+      <button type="button" class="btn" id="salir">Salir</button>
+    </div>
+  </div>
+  <nav class="menu" aria-label="Secciones del panel">
+    <ul class="menu__lista" id="menu"></ul>
+  </nav>
+</header>
+
+<main class="contenido" id="vista" tabindex="-1"></main>
+
+<noscript><p style="padding:24px;">Este panel necesita JavaScript para funcionar.</p></noscript>
+
+<script src="js/config.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/api.js"></script>
+<script src="js/datos.js"></script>
+<script src="js/vistas-bandas.js"></script>
+<script src="js/vista-asistencia.js"></script>
+<script src="js/vistas-admin.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<svg width="1600" height="1000" viewBox="0 0 1600 1000" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b223d"/>
+      <stop offset="100%" stop-color="#122e52"/>
+    </linearGradient>
+    <linearGradient id="note" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f2b84b" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#f5d17a" stop-opacity="0.6" />
+    </linearGradient>
+    <pattern id="staff" width="160" height="200" patternUnits="userSpaceOnUse">
+      <rect width="160" height="200" fill="transparent" />
+      <path d="M0 40 H160 M0 70 H160 M0 100 H160 M0 130 H160 M0 160 H160" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <rect width="1600" height="1000" fill="url(#staff)"/>
+  <path d="M240 380c120-50 240-70 360-20c130 60 220 120 340 80c100-32 160-124 240-112" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="8" stroke-linecap="round"/>
+  <path d="M260 500c100-32 180-40 280 0s168 70 250 50s150-80 210-70" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="600" cy="310" r="28" fill="url(#note)"/>
+  <rect x="622" y="250" width="16" height="120" fill="url(#note)"/>
+  <circle cx="790" cy="380" r="24" fill="url(#note)"/>
+  <rect x="806" y="320" width="14" height="110" fill="url(#note)"/>
+  <path d="M1150 420c0 18-14 32-32 32s-32-14-32-32 14-32 32-32 32 14 32 32z" fill="url(#note)"/>
+  <rect x="1200" y="250" width="16" height="140" fill="url(#note)"/>
+  <rect x="570" y="480" width="220" height="16" rx="8" fill="rgba(255,255,255,0.08)"/>
+  <circle cx="620" cy="500" r="12" fill="rgba(255,255,255,0.18)"/>
+  <circle cx="990" cy="530" r="14" fill="rgba(255,255,255,0.16)"/>
+</svg>
