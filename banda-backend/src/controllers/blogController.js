@@ -10,11 +10,32 @@ const textoOpcional = (valor) => (valor === undefined || valor === null ? null :
 
 // GET /api/blog — público. Entradas activas, de la más reciente a la más antigua.
 // ?limite=N acota el resultado (para el carrusel del index).
+// ?pagina=P (1 = la primera, requiere limite) pagina de a `limite` entradas: ?limite=12&pagina=2.
 const getEntradas = async (req, res) => {
-    const { limite } = req.query;
+    const { limite, pagina } = req.query;
 
     if (limite !== undefined && (!/^\d+$/.test(String(limite)) || Number(limite) < 1 || Number(limite) > LIMITE_MAXIMO)) {
         return res.status(400).json({ mensaje: `limite debe ser un número entre 1 y ${LIMITE_MAXIMO}` });
+    }
+
+    if (pagina !== undefined) {
+        if (limite === undefined) {
+            return res.status(400).json({ mensaje: 'pagina requiere limite' });
+        }
+        if (!/^\d{1,6}$/.test(String(pagina)) || Number(pagina) < 1) {
+            return res.status(400).json({ mensaje: 'pagina debe ser un número entero mayor o igual a 1' });
+        }
+    }
+
+    const valores = [];
+    let paginacion = '';
+    if (limite) {
+        valores.push(Number(limite));
+        paginacion = 'LIMIT $1';
+        if (pagina) {
+            valores.push((Number(pagina) - 1) * Number(limite));
+            paginacion += ' OFFSET $2';
+        }
     }
 
     try {
@@ -23,8 +44,8 @@ const getEntradas = async (req, res) => {
              FROM public.entrada_blog
              WHERE activo = true
              ORDER BY fecha DESC, id_entrada DESC
-             ${limite ? 'LIMIT $1' : ''}`,
-            limite ? [Number(limite)] : []
+             ${paginacion}`,
+            valores
         );
 
         res.json(result.rows);

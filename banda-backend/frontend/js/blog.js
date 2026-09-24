@@ -5,10 +5,8 @@
 
     var API_BASE = window.RB.API_BASE;
 
-    // GET /api/blog solo acepta ?limite=N (1 a 100) y no tiene offset ni página.
-    // "Cargar más" vuelve a pedir con un límite mayor y agrega solo las entradas nuevas.
+    // "Cargar más" pide la página siguiente: GET /api/blog?limite=12&pagina=N
     var LOTE = 12;
-    var LIMITE_MAXIMO = 100; // el mismo tope que valida blogController.js
     var LARGO_RESUMEN = 120;
 
     var estado = document.getElementById('blog-estado');
@@ -18,6 +16,7 @@
 
     var idsMostrados = {};
     var cantidadMostrada = 0;
+    var paginaSiguiente = 1;
 
     // Recorta en el último espacio antes del límite para no partir palabras
     function recortar(texto, largo) {
@@ -143,8 +142,8 @@
         return li;
     }
 
-    function pedirEntradas(limite) {
-        return fetch(API_BASE + '/blog?limite=' + limite, { headers: { Accept: 'application/json' } })
+    function pedirEntradas(pagina) {
+        return fetch(API_BASE + '/blog?limite=' + LOTE + '&pagina=' + pagina, { headers: { Accept: 'application/json' } })
             .then(function (res) {
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 return res.json();
@@ -156,16 +155,17 @@
     }
 
     function cargar() {
-        var limite = Math.min(cantidadMostrada + LOTE, LIMITE_MAXIMO);
         var esPrimeraCarga = cantidadMostrada === 0;
 
         botonMas.disabled = true;
         botonMas.textContent = 'Cargando…';
         if (esPrimeraCarga) estado.textContent = 'Cargando entradas…';
 
-        pedirEntradas(limite)
+        pedirEntradas(paginaSiguiente)
             .then(function (entradas) {
-                // Se descartan las ya mostradas por id: si se publicó algo entre dos pedidos, no se duplica
+                paginaSiguiente++;
+                // Se descartan las ya mostradas por id: si se publicó algo entre dos páginas, las
+                // entradas se corren una posición y la primera de la página siguiente ya estaba en pantalla
                 var fragmento = document.createDocumentFragment();
                 entradas.forEach(function (entrada) {
                     if (!entrada || idsMostrados[entrada.id_entrada]) return;
@@ -186,9 +186,8 @@
                 rejilla.hidden = false;
                 estado.hidden = true;
 
-                // Hay más si la API llenó el límite pedido y todavía no se llegó al tope del endpoint
-                var hayMas = entradas.length === limite && limite < LIMITE_MAXIMO;
-                botonMas.hidden = !hayMas;
+                // Una página completa indica que puede haber más; si la siguiente llega vacía, el botón se oculta
+                botonMas.hidden = entradas.length < LOTE;
             })
             .catch(function () {
                 estado.hidden = false;
