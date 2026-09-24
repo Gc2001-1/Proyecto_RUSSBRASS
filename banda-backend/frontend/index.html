@@ -11,17 +11,58 @@
   .navlink{color:#46453D}
   .navlink:hover{color:#0A0A08}
   img{max-width:100%;display:block;}
+
+  /* Layout responsive. Mismos puntos de quiebre que blog.html y css/panel.css: 720px y 1024px */
+  .cabecera{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;padding:28px 20px;max-width:1280px;margin:0 auto;box-sizing:border-box;}
+  .cabecera nav{display:flex;align-items:center;flex-wrap:wrap;gap:20px 28px;}
+  .hero{padding:64px 20px;}
+  .hero h1{font-size:36px;}
+  .bandas-rejilla{display:grid;grid-template-columns:minmax(0,1fr);}
+  .quienes{padding:40px 20px;}
+  .banda{padding:40px 24px;}
+  .mision-rejilla{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:40px;}
+  .mision-divisor{background:rgba(246,241,228,0.2);height:1px;width:100%;}
+  .seccion-mision{padding:64px 20px;}
+  .seccion-aprende{padding:56px 20px;}
+  .pie{padding:56px 20px;}
+  @media (min-width: 720px) {
+    .cabecera{padding:28px 40px;}
+    .cabecera nav{gap:36px;}
+    .hero{padding:88px 40px;}
+    .hero h1{font-size:46px;}
+    .bandas-rejilla{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .bandas-rejilla .banda:last-child{grid-column:1 / -1;}
+    .quienes{padding:48px 40px;}
+    .banda{padding:48px 36px;}
+    .mision-rejilla{grid-template-columns:1fr 1px 1fr;gap:48px;}
+    .mision-divisor{width:1px;height:100%;}
+    .seccion-mision{padding:80px 40px;}
+    .seccion-aprende{padding:72px 40px;}
+    .pie{padding:64px 40px;}
+  }
+  @media (min-width: 1024px) {
+    .cabecera{padding:28px 64px;}
+    .hero{padding:110px 64px;}
+    .hero h1{font-size:52px;}
+    .bandas-rejilla{grid-template-columns:repeat(3,minmax(0,1fr));}
+    .bandas-rejilla .banda:last-child{grid-column:auto;}
+    .quienes{padding:56px 64px;}
+    .mision-rejilla{gap:64px;}
+    .seccion-mision{padding:96px 64px;}
+    .seccion-aprende{padding:80px 64px;}
+    .pie{padding:64px;}
+  }
 </style>
 </head>
 <body>
 <div style="width:100%;">
 
-<header style="display:flex;align-items:center;justify-content:space-between;padding:28px 64px;max-width:1280px;margin:0 auto;">
+<header class="cabecera">
   <div style="display:flex;align-items:center;gap:12px;">
     <img src="assets/logo.jpg" alt="Logo de la Fundación RussBrass" style="width:44px;height:44px;border-radius:50%;object-fit:cover;">
     <span style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.04em;line-height:1;">RussBrass</span>
   </div>
-  <nav style="display:flex;align-items:center;gap:36px;">
+  <nav>
     <a class="navlink" href="#mision" style="font-size:15px;">Misión</a>
     <a class="navlink" href="#bandas" style="font-size:15px;">Bandas</a>
     <a class="navlink" href="blog.html" style="font-size:15px;">Blog</a>
@@ -29,11 +70,11 @@
   </nav>
 </header>
 
-<section style="background:linear-gradient(90deg, rgba(10,10,8,0.9) 0%, rgba(10,10,8,0.55) 55%, rgba(10,10,8,0.15) 100%), url('assets/hero-nino-trompeta.jpg') center 30%/cover no-repeat;padding:110px 64px;">
+<section class="hero" style="background:linear-gradient(90deg, rgba(10,10,8,0.9) 0%, rgba(10,10,8,0.55) 55%, rgba(10,10,8,0.15) 100%), url('assets/hero-nino-trompeta.jpg') center 30%/cover no-repeat;">
   <div style="max-width:1280px;margin:0 auto;">
     <div style="max-width:560px;">
       <p style="font-size:15px;color:#D6FF3F;margin:0 0 16px;font-weight:500;">Fundación de música para niños y jóvenes</p>
-      <h1 style="font-family:'Fraunces',serif;font-size:52px;line-height:1.1;margin:0 0 24px;font-weight:500;color:#F4F4EE;">Un lugar donde cada niño aprende a tocar, a escuchar y a pertenecer.</h1>
+      <h1 style="font-family:'Fraunces',serif;line-height:1.1;margin:0 0 24px;font-weight:500;color:#F4F4EE;">Un lugar donde cada niño aprende a tocar, a escuchar y a pertenecer.</h1>
       <p style="font-size:18px;line-height:1.7;color:#D6D6CC;max-width:500px;margin:0 0 32px;">En RussBrass ofrecemos formación musical gratuita para niños y jóvenes de la comunidad, a través de tres bandas: de paz, de música clásica y de orquesta. Aquí la disciplina y el trabajo en equipo se aprenden con un instrumento en las manos.</p>
       <a href="#bandas" style="display:inline-block;padding:14px 28px;background:#D6FF3F;color:#0A0A08;border-radius:4px;font-size:15px;">Conoce nuestras bandas</a>
     </div>
@@ -41,9 +82,9 @@
 </section>
 
 <section id="bandas" style="max-width:1280px;margin:0 auto;">
-  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));">
+  <div class="bandas-rejilla">
 
-    <a href="#mision" style="grid-column:1 / -1;background:linear-gradient(90deg, rgba(10,10,8,0.88), rgba(10,10,8,0.55)), url('assets/junta-directiva.jpg') center 25%/cover no-repeat;color:#F4F4EE;padding:56px 64px;display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap;">
+    <a href="#mision" class="quienes" style="grid-column:1 / -1;background:linear-gradient(90deg, rgba(10,10,8,0.88), rgba(10,10,8,0.55)), url('assets/junta-directiva.jpg') center 25%/cover no-repeat;color:#F4F4EE;display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap;">
       <div style="max-width:640px;">
         <h2 style="font-family:'Fraunces',serif;font-size:28px;font-weight:500;margin:0 0 14px;">Quiénes somos</h2>
         <p style="font-size:16px;line-height:1.7;color:#D7D2C4;margin:0;">Un proyecto de la Fundación SumbraSS para acercar la música a niños y jóvenes de la comunidad, sin costo y sin requisitos de entrada.</p>
@@ -51,7 +92,7 @@
       <span style="font-size:14px;color:#D6FF3F;border-bottom:1px solid #D6FF3F;padding-bottom:2px;white-space:nowrap;">Conocer más</span>
     </a>
 
-    <a href="#" style="background:linear-gradient(180deg, rgba(22,32,43,0.1), rgba(22,32,43,0.8)), url('assets/banda-de-paz.jpg') center/cover no-repeat;color:#F4F4EE;padding:48px 36px;display:flex;flex-direction:column;justify-content:flex-end;gap:28px;min-height:320px;">
+    <a href="#" class="banda" style="background:linear-gradient(180deg, rgba(22,32,43,0.1), rgba(22,32,43,0.8)), url('assets/banda-de-paz.jpg') center/cover no-repeat;color:#F4F4EE;display:flex;flex-direction:column;justify-content:flex-end;gap:28px;min-height:320px;">
       <div>
         <h3 style="font-family:'Fraunces',serif;font-size:22px;font-weight:500;margin:0 0 10px;color:#F4F4EE;">Banda de paz</h3>
         <p style="font-size:14.5px;line-height:1.7;color:#E9E5D8;margin:0 0 18px;">Percusión y viento a paso de marcha. El primer contacto con el ritmo y la disciplina del compás compartido.</p>
@@ -59,7 +100,7 @@
       </div>
     </a>
 
-    <a href="#" style="background:#D6FF3F;color:#0A0A08;padding:48px 36px;display:flex;flex-direction:column;justify-content:space-between;gap:28px;min-height:320px;">
+    <a href="#" class="banda" style="background:#D6FF3F;color:#0A0A08;display:flex;flex-direction:column;justify-content:space-between;gap:28px;min-height:320px;">
       <div style="width:52px;height:52px;color:#0A0A08;">
         <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%;" role="img" aria-label="Icono de violín de banda de música clásica">
           <path d="M24 20 C18 24 18 32 24 36 C18 40 18 48 24 52 C30 56 38 56 44 52 C50 48 50 40 44 36 C50 32 50 24 44 20 C38 16 30 16 24 20 Z"/>
@@ -76,7 +117,7 @@
       </div>
     </a>
 
-    <a href="#" style="background:#0A0A08;color:#F4F4EE;padding:48px 36px;display:flex;flex-direction:column;justify-content:space-between;gap:28px;min-height:320px;">
+    <a href="#" class="banda" style="background:#0A0A08;color:#F4F4EE;display:flex;flex-direction:column;justify-content:space-between;gap:28px;min-height:320px;">
       <div style="width:52px;height:52px;color:#D6FF3F;">
         <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:100%;height:100%;" role="img" aria-label="Icono de batuta de orquesta">
           <line x1="18" y1="50" x2="46" y2="16"/>
@@ -95,13 +136,13 @@
   </div>
 </section>
 
-<section id="mision" style="background:#0A0A08;color:#F4F4EE;padding:96px 64px;">
-  <div style="max-width:1120px;margin:0 auto;display:grid;grid-template-columns:1fr 1px 1fr;gap:64px;">
+<section id="mision" class="seccion-mision" style="background:#0A0A08;color:#F4F4EE;">
+  <div class="mision-rejilla">
     <div>
       <h2 style="font-family:'Fraunces',serif;font-size:26px;font-weight:500;margin:0 0 20px;color:#D6FF3F;">Misión</h2>
       <p style="font-size:17px;line-height:1.75;color:#D7D2C4;margin:0;">Formar a niños y jóvenes a través de la música, ofreciendo educación musical gratuita y de calidad en bandas de paz, música clásica y orquesta, para que la disciplina, el trabajo en equipo y la expresión artística sean herramientas de desarrollo personal y comunitario.</p>
     </div>
-    <div style="background:rgba(246,241,228,0.2);width:1px;height:100%;"></div>
+    <div class="mision-divisor" aria-hidden="true"></div>
     <div>
       <h2 style="font-family:'Fraunces',serif;font-size:26px;font-weight:500;margin:0 0 20px;color:#D6FF3F;">Visión</h2>
       <p style="font-size:17px;line-height:1.75;color:#D7D2C4;margin:0;">Ser una fundación de referencia en la formación musical infantil y juvenil, donde cada niño, sin importar su condición, tenga la oportunidad de aprender un instrumento, pertenecer a una comunidad y construir un futuro con disciplina y propósito.</p>
@@ -109,7 +150,7 @@
   </div>
 </section>
 
-<section style="background:#ECECE4;padding:80px 64px;">
+<section class="seccion-aprende" style="background:#ECECE4;">
   <div style="max-width:900px;margin:0 auto;">
     <h2 style="font-family:'Fraunces',serif;font-size:28px;font-weight:500;margin:0 0 28px;">Lo que se aprende, además de música</h2>
     <p style="font-size:17px;line-height:1.8;color:#46453D;max-width:720px;margin:0 0 40px;">Un ensayo enseña a llegar a tiempo. Una presentación enseña a preparase en equipo. Un instrumento compartido enseña a cuidar lo que no es solo tuyo. La música es la excusa; lo que se construye alrededor de ella es lo que se queda.</p>
@@ -122,7 +163,7 @@
   </div>
 </section>
 
-<footer style="padding:64px;background:#0A0A08;color:#D7D2C4;">
+<footer class="pie" style="background:#0A0A08;color:#D7D2C4;">
   <div style="max-width:1280px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:48px;">
     <div>
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
