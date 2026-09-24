@@ -11,6 +11,7 @@ const asistenciaRoutes = require('./src/routes/asistenciaRoutes');
 const bandaRoutes = require('./src/routes/bandaRoutes');
 const profesorRoutes = require('./src/routes/profesorRoutes');
 const reporteRoutes = require('./src/routes/reporteRoutes');
+const blogRoutes = require('./src/routes/blogRoutes');
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use('/api/asistencia', asistenciaRoutes);
 app.use('/api/bandas', bandaRoutes);
 app.use('/api/profesores', profesorRoutes);
 app.use('/api/reportes', reporteRoutes);
+app.use('/api/blog', blogRoutes);
 
 app.get('/', (req, res) => {
     res.json({ mensaje: 'API de Control de Bandas funcionando correctamente 🚀' });
