@@ -3,3 +3,6 @@ node_modules/
 *.log
 .idea/
 *.iml
+
+# Fotos subidas desde el panel (contenido de usuarios, no código)
+banda-backend/frontend/uploads/

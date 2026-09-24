@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const db = require('./src/config/db');
@@ -17,6 +18,9 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Fotos subidas con multer (src/config/upload.js las guarda en frontend/uploads)
+app.use('/uploads', express.static(path.join(__dirname, 'frontend', 'uploads')));
 
 // Registrar Endpoints
 app.use('/api/auth', authRoutes);
