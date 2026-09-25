@@ -82,11 +82,13 @@
     }
 
     // RB.api('GET', '/bandas') | RB.api('POST', '/alumnos', { cuerpo: {...} }) | { query: {...}, sinSesion: true }
+    // Con archivos: { formulario: FormData } se envía como multipart/form-data (el navegador pone el Content-Type).
     RB.api = async function (metodo, ruta, opciones) {
         opciones = opciones || {};
         var headers = { Accept: 'application/json' };
         var tieneCuerpo = opciones.cuerpo !== undefined;
         if (tieneCuerpo) headers['Content-Type'] = 'application/json';
+        var cuerpo = opciones.formulario || (tieneCuerpo ? JSON.stringify(opciones.cuerpo) : undefined);
 
         var token = RB.sesion.token();
         if (token && !opciones.sinSesion) headers.Authorization = 'Bearer ' + token;
@@ -96,7 +98,7 @@
             respuesta = await fetch(RB.API_BASE + ruta + queryString(opciones.query), {
                 method: metodo,
                 headers: headers,
-                body: tieneCuerpo ? JSON.stringify(opciones.cuerpo) : undefined
+                body: cuerpo
             });
         } catch (e) {
             throw new ApiError(0, 'No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.');

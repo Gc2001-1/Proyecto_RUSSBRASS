@@ -21,6 +21,7 @@
 
     var enlacesMenu = [{ id: 'bandas', texto: 'Bandas', ruta: '#/bandas' }];
     if (esAdmin) enlacesMenu.push({ id: 'profesores', texto: 'Profesores', ruta: '#/admin/profesores' });
+    if (esAdmin) enlacesMenu.push({ id: 'blog', texto: 'Blog', ruta: '#/admin/blog' });
 
     var menu = document.getElementById('menu');
     menu.replaceChildren.apply(menu, enlacesMenu.map(function (e) {
@@ -45,7 +46,8 @@
         { re: /^\/admin\/banda\/(\d+)\/profesores$/, nav: 'bandas', admin: true, vista: V.bandaProfesores },
         { re: /^\/admin\/profesores$/, nav: 'profesores', admin: true, vista: V.profesores },
         { re: /^\/admin\/profesor\/nuevo$/, nav: 'profesores', admin: true, vista: V.profesorForm },
-        { re: /^\/admin\/profesor\/(\d+)\/editar$/, nav: 'profesores', admin: true, vista: V.profesorForm }
+        { re: /^\/admin\/profesor\/(\d+)\/editar$/, nav: 'profesores', admin: true, vista: V.profesorForm },
+        { re: /^\/admin\/blog$/, nav: 'blog', admin: true, vista: V.blog }
     ];
 
     var version = 0;      // sirve para descartar respuestas de una vista a la que el usuario ya no está mirando
